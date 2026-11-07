@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JARVIS AI</string>
+    <string name="assistant_name">JARVIS</string>
+    <string name="greeting">Hello, I\'m JARVIS</string>
+    <string name="wake_notification_title">JARVIS is listening for Hey JARVIS</string>
+    <string name="wake_notification_text">Microphone is on only while this notification is visible. Tap to open.</string>
+    <string name="channel_assistant">Assistant</string>
+    <string name="channel_service">Background service</string>
+    <string name="channel_reminders">Reminders</string>
+</resources>
