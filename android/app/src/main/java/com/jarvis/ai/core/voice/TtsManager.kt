@@ -9,29 +9,44 @@ import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
 class TtsManager(context: Context) {
+
     private val ready = AtomicBoolean(false)
+
     private var speakingCb: ((Boolean) -> Unit)? = null
-    private val tts = TextToSpeech(context.applicationContext) { status ->
-        ready.set(status == TextToSpeech.SUCCESS)
-        if (ready.get()) {
-            tts.setSpeechRate(0.98f)
-            tts.setPitch(1.02f)
-        }
-    }
+
+    // Explicit type prevents recursive type checking.
+    private lateinit var tts: TextToSpeech
 
     init {
-        tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-            override fun onStart(utteranceId: String?) {
-                speakingCb?.invoke(true)
+
+        tts = TextToSpeech(context.applicationContext) { status ->
+
+            val success = status == TextToSpeech.SUCCESS
+            ready.set(success)
+
+            if (success && ::tts.isInitialized) {
+                tts.setSpeechRate(0.98f)
+                tts.setPitch(1.02f)
             }
-            override fun onDone(utteranceId: String?) {
-                speakingCb?.invoke(false)
+        }
+
+        tts.setOnUtteranceProgressListener(
+            object : UtteranceProgressListener() {
+
+                override fun onStart(utteranceId: String?) {
+                    speakingCb?.invoke(true)
+                }
+
+                override fun onDone(utteranceId: String?) {
+                    speakingCb?.invoke(false)
+                }
+
+                @Deprecated("Deprecated in Java")
+                override fun onError(utteranceId: String?) {
+                    speakingCb?.invoke(false)
+                }
             }
-            @Deprecated("Deprecated in Java")
-            override fun onError(utteranceId: String?) {
-                speakingCb?.invoke(false)
-            }
-        })
+        )
     }
 
     fun onSpeaking(cb: (Boolean) -> Unit) {
@@ -39,39 +54,78 @@ class TtsManager(context: Context) {
     }
 
     fun speak(text: String, lang: SpeechLang) {
+
         if (!ready.get() || text.isBlank()) return
+
         val locale = pickLocale(lang)
-        tts.language = locale
+
+        val result = tts.setLanguage(locale)
+
+        if (result == TextToSpeech.LANG_MISSING_DATA ||
+            result == TextToSpeech.LANG_NOT_SUPPORTED
+        ) {
+            return
+        }
+
         val id = UUID.randomUUID().toString()
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
+
+        tts.speak(
+            text,
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            id
+        )
     }
 
     fun stop() {
-        tts.stop()
+        if (::tts.isInitialized) {
+            tts.stop()
+        }
+
         speakingCb?.invoke(false)
     }
 
-    fun isSpeaking(): Boolean = tts.isSpeaking
+    fun isSpeaking(): Boolean {
+        return ::tts.isInitialized && tts.isSpeaking
+    }
 
     fun shutdown() {
-        tts.stop()
-        tts.shutdown()
+        ready.set(false)
+
+        if (::tts.isInitialized) {
+            tts.stop()
+            tts.shutdown()
+        }
     }
 
     private fun pickLocale(lang: SpeechLang): Locale {
-        val wanted = if (lang == SpeechLang.BN) listOf(
-            Locale.forLanguageTag("bn-BD"),
-            Locale.forLanguageTag("bn-IN"),
-            Locale("bn")
-        ) else listOf(
-            Locale.US,
-            Locale.UK,
-            Locale.ENGLISH
-        )
-        for (loc in wanted) {
-            val r = tts.isLanguageAvailable(loc)
-            if (r >= TextToSpeech.LANG_AVAILABLE) return loc
+
+        val wanted = if (lang == SpeechLang.BN) {
+
+            listOf(
+                Locale.forLanguageTag("bn-BD"),
+                Locale.forLanguageTag("bn-IN"),
+                Locale("bn")
+            )
+
+        } else {
+
+            listOf(
+                Locale.US,
+                Locale.UK,
+                Locale.ENGLISH
+            )
         }
+
+        for (loc in wanted) {
+
+            val result = tts.isLanguageAvailable(loc)
+
+            if (result >= TextToSpeech.LANG_AVAILABLE) {
+                return loc
+            }
+        }
+
         return Locale.getDefault()
     }
 }
