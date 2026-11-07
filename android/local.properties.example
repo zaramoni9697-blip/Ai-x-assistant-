@@ -1,0 +1,6 @@
+## Copy to local.properties (never commit the real file).
+## Android Studio usually writes sdk.dir for you.
+sdk.dir=/home/USER/Android/Sdk
+
+## Optional default backend baked into BuildConfig
+## JARVIS_API_URL=https://your-jarvis-backend.example.com/

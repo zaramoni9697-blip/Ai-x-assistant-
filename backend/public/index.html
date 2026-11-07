@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JARVIS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Share+Tech+Mono&family=Noto+Sans+Bengali:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="hud-bg"></div>
+  <canvas id="grid"></canvas>
+
+  <section id="login-view" class="view">
+    <div class="core-wrap">
+      <div class="core"></div>
+    </div>
+    <h1>JARVIS</h1>
+    <p class="tag">ADMINISTRATOR ACCESS</p>
+    <form id="login-form" class="panel">
+      <label>Email<input id="email" type="email" autocomplete="username" required /></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required /></label>
+      <button type="submit">AUTHENTICATE</button>
+      <p id="login-error" class="error"></p>
+      <p class="hint">Admin role is assigned on the server. Client-side flags cannot grant access.</p>
+    </form>
+  </section>
+
+  <section id="dash-view" class="view hidden">
+    <header>
+      <div class="brand">
+        <div class="mini-core"></div>
+        <div>
+          <h2>JARVIS CONTROL</h2>
+          <span id="who"></span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="health-pill" class="pill">SYSTEM</span>
+        <button id="logout" type="button">LOGOUT</button>
+      </div>
+    </header>
+
+    <nav>
+      <button data-tab="overview" class="active">Overview</button>
+      <button data-tab="users">Users</button>
+      <button data-tab="usage">AI Usage</button>
+      <button data-tab="config">Config</button>
+    </nav>
+
+    <p class="privacy">Private chats, passwords, API keys and memories are never shown here.</p>
+
+    <div id="tab-overview" class="tab">
+      <div class="cards" id="stat-cards"></div>
+      <div class="panel">
+        <h3>Backend health</h3>
+        <pre id="health-json">loading…</pre>
+      </div>
+    </div>
+
+    <div id="tab-users" class="tab hidden">
+      <div class="row">
+        <input id="user-q" placeholder="Search email or name" />
+        <button id="user-refresh" type="button">REFRESH</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th><th>Name</th><th>Role</th><th>Status</th><th>Language</th><th>Last active</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="user-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-usage" class="tab hidden">
+      <div class="panel"><pre id="usage-json">loading…</pre></div>
+    </div>
+
+    <div id="tab-config" class="tab hidden">
+      <form id="config-form" class="panel grid2">
+        <label>Allow signups
+          <select name="allow_signups">
+            <option value="true">true</option>
+            <option value="false">false</option>
+          </select>
+        </label>
+        <label>Maintenance mode
+          <select name="maintenance_mode">
+            <option value="false">false</option>
+            <option value="true">true</option>
+          </select>
+        </label>
+        <label>Max message length
+          <input name="max_message_length" type="number" min="500" max="20000" />
+        </label>
+        <label>Wake word default
+          <select name="wake_word_enabled_default">
+            <option value="false">false</option>
+            <option value="true">true</option>
+          </select>
+        </label>
+        <button type="submit">SAVE CONFIGURATION</button>
+      </form>
+      <div class="panel">
+        <h3>Secret status (values never displayed)</h3>
+        <pre id="secret-json"></pre>
+      </div>
+    </div>
+  </section>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

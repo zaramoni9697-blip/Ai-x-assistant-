@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JARVIS AI</string>
+    <string name="assistant_name">JARVIS</string>
+    <string name="greeting">হ্যালো, আমি JARVIS</string>
+    <string name="wake_notification_title">JARVIS \'Hey JARVIS\' শুনছে</string>
+    <string name="wake_notification_text">মাইক্রোফোন শুধু এই নোটিফিকেশন দেখা থাকলে চালু। খুলতে ট্যাপ করুন।</string>
+    <string name="channel_assistant">সহকারী</string>
+    <string name="channel_service">ব্যাকগ্রাউন্ড সার্ভিস</string>
+    <string name="channel_reminders">রিমাইন্ডার</string>
+</resources>
