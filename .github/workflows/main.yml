@@ -1,0 +1,44 @@
+name: Build JARVIS APK
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    name: Assemble debug APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Build debug APK
+        run: gradle :app:assembleDebug --stacktrace
+        env:
+          JARVIS_API_URL: http://10.0.2.2:8080/
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-ai-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
